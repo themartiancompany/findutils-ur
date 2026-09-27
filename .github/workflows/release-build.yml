@@ -1229,7 +1229,7 @@ jobs:
       - name:
           Upload the Android package.
         uses:
-          actions/upload-release-asset@v1
+          actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN:
             ${{ secrets.GITHUB_TOKEN }}
@@ -2096,7 +2096,7 @@ jobs:
             # mingw-w64-ucrt-${{ matrix.env }}-jq
             # mingw-w64-ucrt-${{ matrix.env }}-github-cli
       - name:
-          Upgrade MinGW64 environment.
+          Upgrade MSYS2 environment.
         run: |
           pacman \
             -Syu \
@@ -2650,7 +2650,12 @@ jobs:
               recipe-get \
                 "PKGBUILD" \
                 "pkgbase")" && \
-          arch="${_arch}" \
+          if [[ "${{ env.sys }}" == "MSYS" ]]; then \
+            _msys2_libc="msys2"; \
+          elif [[ "${{ env.sys }}" == "mingw64" ]]; then \
+            _msys2_libc="mingw64"; \
+          fi; \
+          PKGEXT='.pkg.tar.xz' \
           _evmfs="false" \
           _git="false" \
           _git_service="github" \
@@ -2661,7 +2666,7 @@ jobs:
               "${HOME}/${_pkgbase}-build" \
             -u \
             -G \
-              "msys2" \
+              "${_msys2_libc}" \
             -- \
             -df \
             --nocheck \
